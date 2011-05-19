@@ -1,6 +1,9 @@
 #include <xs1.h>
 #include <stdio.h>
 
+#define MEM_LENGTH 8192
+short memoryWord[MEM_LENGTH/2];
+
 void passthrough(streaming chanend fromRx, streaming chanend toTx) {
     unsigned char byte;
     while (!stestct(fromRx)) {
@@ -9,11 +12,96 @@ void passthrough(streaming chanend fromRx, streaming chanend toTx) {
     soutct(toTx, sinct(fromRx));
 }
 
+static inline unsigned char passByte(streaming chanend fromRx, streaming chanend toTx) {
+    unsigned char byte;
+    fromRx :> byte; toTx <: byte;
+    return byte;
+}
+
+static inline int pass16(streaming chanend fromRx, streaming chanend toTx) {
+    unsigned char byteH, byteL;
+    fromRx :> byteL; toTx <: byteL; // ADO, Physical address
+    fromRx :> byteH; toTx <: byteH; // ADO
+    return byteL | (byteH << 8);
+}
+
+static inline int pass32(streaming chanend fromRx, streaming chanend toTx) {
+    unsigned char byteH, byteL;
+    int a;
+    fromRx :> byteL; toTx <: byteL;
+    fromRx :> byteH; toTx <: byteH;
+    a = byteL | (byteH << 8);
+    fromRx :> byteH; toTx <: byteH;
+    a |= byteH << 16;
+    fromRx :> byteH; toTx <: byteH;
+    return a | byteH << 24;
+}
+
+static inline int passADPinc(streaming chanend fromRx, streaming chanend toTx) {
+    unsigned char byteH, byteL, byteH_, byteL_;
+    fromRx :> byteL;  // Auto Inc address
+    byteL_ = byteL + 1;
+    toTx <: byteL_;
+    fromRx :> byteH;  // Auto Inc address
+    if (byteL_) {
+        byteH_ = byteH + 1;
+    }
+    toTx <: byteH_;
+    return (byteL | byteH) == 0;
+}
+
+static inline int passADO(streaming chanend fromRx, streaming chanend toTx) {
+    return pass16(fromRx, toTx);
+}
+
+static inline int passADR(streaming chanend fromRx, streaming chanend toTx) {
+    return pass32(fromRx, toTx);
+}
+
+static inline int passADP(streaming chanend fromRx, streaming chanend toTx) {
+    return pass16(fromRx, toTx);
+}
+
+static inline int passTotalLength(streaming chanend fromRx, streaming chanend toTx) {
+    return pass16(fromRx, toTx);
+}
+
+static inline int passLEN(streaming chanend fromRx, streaming chanend toTx, int &morePDUs) {
+    unsigned char byteH, byteL;
+    fromRx :> byteL; toTx <: byteL; // LEN
+    fromRx :> byteH; toTx <: byteH; // LEN
+    morePDUs = byteH >> 7;
+    return byteL | ((byteH << 8) & 0x7);
+}
+
+static inline void passIRQ(streaming chanend fromRx, streaming chanend toTx) {
+    passByte(fromRx, toTx);
+    passByte(fromRx, toTx);
+}
+
+static inline void passWKCinc(streaming chanend fromRx, streaming chanend toTx) {
+    unsigned char byteH, byteL, byteH_, byteL_;
+    fromRx :> byteL;
+    byteL_ = byteL + 1;
+    toTx <: byteL_;
+    fromRx :> byteH;
+    if (byteL_) {
+        byteH_ = byteH + 1;
+    }
+    toTx <: byteH_;
+}
+
+static inline void passWKC(streaming chanend fromRx, streaming chanend toTx) {
+    passByte(fromRx, toTx);
+    passByte(fromRx, toTx);
+}
+
 void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
-    unsigned char byte, byteL, byteL_, byteH, byteH_, total;
+    unsigned char byte, total;
     while (1) {
 #pragma loop unroll
-        int morePDUs = 1, operate, address, length;
+        int morePDUs = 1, operate, address, length, station, timeStamp;
+        fromRx :> timeStamp; toTx <: timeStamp;
         for(int i = 0; i < 12; i++) {
             fromRx :> byte; toTx <: byte;
         }
@@ -27,9 +115,7 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
             printf("Got <%02x> not 0xA4\n", byte);
             passthrough(fromRx, toTx); continue;
         }
-        fromRx :> byteL; toTx <: byteL; // total Length
-        fromRx :> byteH; toTx <: byteH; // total Length
-        total = byteL | (byteH << 8);
+        total = passTotalLength(fromRx, toTx);
         
         fromRx :> byte; toTx <: byte; // frame type
         switch(byte) {
@@ -37,53 +123,155 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
             do {
                 fromRx :> byte; toTx <: byte; // Command
                 switch(byte) {
-                case 0x02: // APWR
                 case 0x01: // APRD
-                    fromRx :> byte; toTx <: byte; // IDX
-                    fromRx :> byteL;  // Auto Inc address
-                    byteL_ = byteL + 1;
-                    toTx <: byteL_;
-                    fromRx :> byteH;  // Auto Inc address
-                    if (byteL_) {
-                        byteH_ = byteH + 1;
-                    }
-                    toTx <: byteH_;
-                    operate = (byteL | byteH) == 0;
-                    fromRx :> byteL; toTx <: byteL; // ADO, Physical address
-                    fromRx :> byteH; toTx <: byteH; // ADO
-                    address = byteL | (byteH << 8);
-                    fromRx :> byteL; toTx <: byteL; // LEN
-                    fromRx :> byteH; toTx <: byteH; // LEN
-                    length = byteL | ((byteH << 8) & 0x7);
-                    fromRx :> byte; toTx <: byte; // IRQ
-                    morePDUs = byteH >> 7;
+                    passByte(fromRx, toTx);            // IDX
+                    operate = passADPinc(fromRx, toTx);   // ADP
+                    address = passADO(fromRx, toTx);   // ADO
+                    length = passLEN(fromRx, toTx, morePDUs);   // ADO
+                    passIRQ(fromRx, toTx);
                     total -= length + 12;
-                    fromRx :> byte; toTx <: byte; // IRQ
                     if (operate) {
                         for(int i = 0; i < length; i++) {
                             fromRx :> byte;
-                            toTx <: (unsigned char) 0x88;
+                            toTx <: (memoryWord, unsigned char[])[address++];
                         }
-                        fromRx :> byteL;  // WKC
-                        byteL_ = byteL + 1;
-                        toTx <: byteL_;
-                        fromRx :> byteH;  // WKC
-                        if (byteL_) {
-                            byteH_ = byteH + 1;
-                        }
-                        toTx <: byteH_;
+                        passWKCinc(fromRx, toTx);
                     } else {
                         for(int i = 0; i < length; i++) {
-                            fromRx :> byte; toTx <: byte; // DATA
+                            passByte(fromRx, toTx);
                         }
-                        fromRx :> byteL; toTx <: byteL; // WKC
-                        fromRx :> byteH; toTx <: byteH; // WKC
+                        passWKC(fromRx, toTx);
                     }
+                    break;
+                case 0x02: // APWR
+                    passByte(fromRx, toTx);            // IDX
+                    operate = passADPinc(fromRx, toTx);   // ADP
+                    address = passADO(fromRx, toTx);   // ADO
+                    length = passLEN(fromRx, toTx, morePDUs);   // ADO
+                    passIRQ(fromRx, toTx);
+                    total -= length + 12;
+                    if (operate) {
+                        for(int i = 0; i < length; i++) {
+                            (memoryWord, unsigned char[])[address++] = passByte(fromRx, toTx);
+                        }
+                        passWKCinc(fromRx, toTx);
+                    } else {
+                        for(int i = 0; i < length; i++) {
+                            passByte(fromRx, toTx);
+                        }
+                        passWKC(fromRx, toTx);
+                    }
+                    break;
+                case 0x04: // FPRD
+                    passByte(fromRx, toTx);            // IDX
+                    station = passADP(fromRx, toTx);   // ADP
+                    operate = station == memoryWord[0x0010/2];
+                    address = passADO(fromRx, toTx);   // ADO
+                    operate |= station == memoryWord[0x0012/2];
+                    length = passLEN(fromRx, toTx, morePDUs);
+                    passIRQ(fromRx, toTx);
+                    total -= length + 12;
+                    if (operate) {
+                        for(int i = 0; i < length; i++) {
+                            fromRx :> byte;
+                            toTx <: (memoryWord, unsigned char[])[address++];
+                        }
+                        passWKCinc(fromRx, toTx);
+                    } else {
+                        for(int i = 0; i < length; i++) {
+                            passByte(fromRx, toTx);
+                        }
+                        passWKC(fromRx, toTx);
+                    }
+                    break;
+                case 0x05: // FPWR
+                    passByte(fromRx, toTx);            // IDX
+                    station = passADP(fromRx, toTx);   // ADP
+                    operate = station == memoryWord[0x0010/2];
+                    address = passADO(fromRx, toTx);   // ADO
+                    operate |= station == memoryWord[0x0012/2];
+                    length = passLEN(fromRx, toTx, morePDUs);
+                    passIRQ(fromRx, toTx);
+                    total -= length + 12;
+                    if (operate) {
+                        for(int i = 0; i < length; i++) {
+                            (memoryWord, unsigned char[])[address++] = passByte(fromRx, toTx);
+                        }
+                        passWKCinc(fromRx, toTx);
+                    } else {
+                        for(int i = 0; i < length; i++) {
+                            passByte(fromRx, toTx);
+                        }
+                        passWKC(fromRx, toTx);
+                    }
+                    break;
+                case 0x07: // BRD
+                    passByte(fromRx, toTx);            // IDX
+                    passADPinc(fromRx, toTx);          // ADP
+                    address = passADO(fromRx, toTx);   // ADO
+                    length = passLEN(fromRx, toTx, morePDUs);
+                    operate = address+length < MEM_LENGTH;
+                    passIRQ(fromRx, toTx);
+                    total -= length + 12;
+                    if (operate) {
+                        for(int i = 0; i < length; i++) {
+                            fromRx :> byte;
+                            toTx <: (unsigned char) (byte | (memoryWord, unsigned char[])[address++]);
+                        }
+                        passWKCinc(fromRx, toTx);
+                    } else {
+                        for(int i = 0; i < length; i++) {
+                            passByte(fromRx, toTx);
+                        }
+                        passWKC(fromRx, toTx);
+                    }
+                    break;
+                case 0x08: // BWR
+                    passByte(fromRx, toTx);            // IDX
+                    passADPinc(fromRx, toTx);   // ADP
+                    address = passADO(fromRx, toTx);   // ADO
+                    length = passLEN(fromRx, toTx, morePDUs);   // ADO
+                    operate = address+length < MEM_LENGTH;
+                    passIRQ(fromRx, toTx);
+                    total -= length + 12;
+                    if (operate) {
+                        for(int i = 0; i < length; i++) {
+                            (memoryWord, unsigned char[])[address++] = passByte(fromRx, toTx);
+                        }
+                        passWKCinc(fromRx, toTx);
+                    } else {
+                        for(int i = 0; i < length; i++) {
+                            passByte(fromRx, toTx);
+                        }
+                        passWKC(fromRx, toTx);
+                    }
+                    break;
+                case 0x0A: // LRD
+                    passByte(fromRx, toTx);            // IDX
+                    address = passADR(fromRx, toTx);   // ADO
+                    length = passLEN(fromRx, toTx, morePDUs);
+                    operate = 1; /* TO BE DECIDED */
+                    passIRQ(fromRx, toTx);
+                    total -= length + 12;
+                    if (operate) {
+                        for(int i = 0; i < length; i++) {
+                            fromRx :> byte;
+                            toTx <: (memoryWord, unsigned char[])[address++];
+                        }
+                        passWKCinc(fromRx, toTx);
+                    } else {
+                        for(int i = 0; i < length; i++) {
+                            passByte(fromRx, toTx);
+                        }
+                        passWKC(fromRx, toTx);
+                    }
+                    break;
+                case 0x0B: // LWR
                     break;
                 default:
                     printf("Did not see a known command but %02x\n", byte);
                     passthrough(fromRx, toTx);
-                    continue;
+                    break;
                 }
             } while (morePDUs);
             break;
@@ -93,10 +281,9 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
             break;
         }
         for(int i = 0; i < total; i++) {      // transmit any trailer, but not the CRC.
-            fromRx :> byteL; toTx <: byteL;   // WKC
+            passByte(fromRx, toTx);
         }
-        soutct(toTx, 3);
         fromRx :> int _;                      // gobble up CRC.
-        sinct(fromRx);
+        soutct(toTx, sinct(fromRx));
     }
 }

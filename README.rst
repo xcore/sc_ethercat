@@ -5,26 +5,35 @@
 
 :Status:  idea
 
-:Maintainer:  henkmuller
+:Maintainer:  https://github.com/henkmuller
 
-:Description:  Outline routines for Ethercat
+:Description:  Feasibility study for EtherCAT
 
 
 Key Features
 ============
 
-* <Bullet pointed list of features>
+* Low latency MII Rx and Tx
+* Rudimentary EtherCAT protocol handler
+* Current latency of 600ns, but memory access has not been implemented yet.
 
 To Do
 =====
 
-* <Bullet pointed list of missing features>
+* Auto detection of ports
+* Multiple ports
+* Port forwarding
+* Mailbox protocol
+* Network variable protocol
+* Memory interface.
 
 Firmware Overview
 =================
 
-The module in this repo are meant to implement Ethercat - an ethernet
-based industrial communications protocol.
+The module in this repo is a feasibility study on coding an EtherCAT slave
+on an XS1 device. The target is either an L2 or a G4, depending on whether
+fast threads are required (> 100 MIPS requires an L2) and on whether a fast
+switch is required (the G4 switch is very low latency).
 
 Known Issues
 ============
@@ -32,9 +41,8 @@ Known Issues
 * <Bullet pointed list of problems>
 
 Required Repositories
-================
+=====================
 
-* <list of repos, likely to include xcommon if it uses the build system>
 * xcommon git\@github.com:xcore/xcommon.git
 
 Support

@@ -11,10 +11,10 @@ port txClk = XS1_PORT_1C;
 port validRx = XS1_PORT_1B;
 port validTx = XS1_PORT_1D;
 buffered in port:8 dataRx = XS1_PORT_4A;
-buffered out port:32 dataTx = XS1_PORT_4B;
+buffered out port:8 dataTx = XS1_PORT_4B;
 
 int main() {
-    streaming chan rx2tx, rx2proto, proto2tx;
+    streaming chan rx2proto, proto2tx;
                                                
     configure_clock_src(clkR, rxClk);
     configure_in_port(validRx, clkR);
@@ -26,8 +26,8 @@ int main() {
     start_clock(clkT);
 
     par {
-        rxProcess(validRx, dataRx, rx2tx, rx2proto);
-        txProcess(dataTx, rx2tx, proto2tx);
+        rxProcess(validRx, dataRx, rx2proto);
+        txProcess(dataTx, proto2tx);
         frameProcess(rx2proto, proto2tx);
     }
     return 0;
