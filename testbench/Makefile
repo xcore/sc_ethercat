@@ -1,5 +1,5 @@
 test: bin/tester
-	bin/tester "../app_ethercat_test/bin/XK-1/app_ethercat_test.xe"
+	bin/tester "$(TFLAG) ../app_ethercat_test/bin/XK-1/app_ethercat_test.xe"
 
 bin/tester: src/stimulus.c
 	if [ ! -d bin ]; then mkdir bin; fi
