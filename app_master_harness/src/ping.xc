@@ -79,25 +79,49 @@ unsigned char packet[] = {
     0x50, 0x51, 0x52, 0x53, 0x54, 0x55, 0x56, 0x57,
     0x58, 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0x5F, // DATA
     0x00, 0x00,  // WKC: working counter.
+
+    1,2,3,4,5,6,7,8// PADDING FOR TX.
 };
 
 
-static int led0Status = 1;
-static int led1Status = 1;
+static int led0Status = ~0;
+static int led1Status = ~0;
 
+#define NAV 100
 
 void handlePacket(int a, int nBytes, int rxTime, int txTime) {
+    static int av[NAV];
+    static int avc = 0;
+    static int avsum;
+    static int avwrapped = 0;
+    int diff = rxTime - txTime;
+    int avg;
     led0Status = ~led0Status;
     led0 <: led0Status;
-    printf("txTime %10u, rxTime %10u diff %d\n", txTime, rxTime, rxTime - txTime);
+    avsum -= av[avc];
+    av[avc] = diff;
+    avsum += diff;
+    avc ++;
+    if (avc == NAV) {
+        avc = 0;
+        avwrapped = 1;
+    }
+    avg = avsum * 1000 / (avwrapped?NAV:avc);
+    printf("txTime %10u, rxTime %10u diff %d ns Av %d.%02d ns \n", txTime, rxTime, diff * 10, avg / 100, avg % 100);
     for(int i = 0; i < nBytes; i++) {
         int v;
-        asm("ldw %0, %1[%2]" : "=r" (v) : "r" (a), "r" (i));
+        asm("ld8u %0, %1[%2]" : "=r" (v) : "r" (a), "r" (i));
         printf(" %02x", v);
-        if ((i & 0xf) == 0xf) {
+        if (v != packet[i]) {
+            printf(" (%02x)", packet[i]);
+        } else {
+            printf("     ");
+        }
+        if ((i & 0x7) == 0x7) {
             printf("\n");
         }
     }
+    printf("\n");
 }
 
 void generateEthercat(chanend cIn, chanend cOut, chanend cNotifications) {
@@ -114,15 +138,15 @@ void generateEthercat(chanend cIn, chanend cOut, chanend cNotifications) {
     miiOutInit(cOut);
     
     t:> timeout;
-    timeout += 100000000;
+    timeout += 200000000;
     while (1) {
         select {
         case miiNotified(miiData, cNotifications);
         case t when timerafter(timeout) :> void:
-            timeout += 100000000;
-            transmitTime = miiOutPacket(cOut, (packet,  int[]), 0, sizeof(packet));
+            timeout += 200000000;
+            transmitTime = miiOutPacket(cOut, (packet,  int[]), 0, sizeof(packet)-8);
             miiOutPacketDone(cOut);
-            led1Status = !led1Status;
+            led1Status = ~led1Status;
             led1 <: led1Status;
             break;
         }
@@ -139,11 +163,10 @@ void generateEthercat(chanend cIn, chanend cOut, chanend cNotifications) {
     } 
 }
 
-
 void ethernetLayer(void) {
     chan cIn, cOut;
     chan notifications;
-    miiInitialise(null, mii);
+    miiInitialise(smi.p_smi_mdio, mii);
     smi_port_init(clk_smi, smi);
     eth_phy_config(1, smi);
     par {

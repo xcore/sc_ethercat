@@ -1,7 +1,7 @@
 Ethercat
 --------
 
-.. toctree:
+.. toctree::
    
    summary
    design-notes

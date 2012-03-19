@@ -5,6 +5,10 @@
 
 #include <xs1.h>
 #include <stdio.h>
+#include <print.h>
+#include "pduhandler.h"
+
+extern int rx0, rx1;
 
 #define MEM_LENGTH 8192
 short memoryWord[MEM_LENGTH/2];
@@ -15,6 +19,8 @@ void passthrough(streaming chanend fromRx, streaming chanend toTx) {
         fromRx :> byte; toTx <: byte;
     }
     soutct(toTx, sinct(fromRx));
+    soutct(toTx, 1); 
+    schkct(fromRx, 1); 
 }
 
 static inline unsigned char passByte(streaming chanend fromRx, streaming chanend toTx) {
@@ -48,7 +54,7 @@ static inline int passADPinc(streaming chanend fromRx, streaming chanend toTx) {
     byteL_ = byteL + 1;
     toTx <: byteL_;
     fromRx :> byteH;  // Auto Inc address
-    if (byteL_) {
+    if (byteL_ == 0) {
         byteH_ = byteH + 1;
     }
     toTx <: byteH_;
@@ -76,7 +82,7 @@ static inline int passLEN(streaming chanend fromRx, streaming chanend toTx, int 
     fromRx :> byteL; toTx <: byteL; // LEN
     fromRx :> byteH; toTx <: byteH; // LEN
     morePDUs = byteH >> 7;
-    return byteL | ((byteH << 8) & 0x7);
+    return byteL | (byteH & 0x7 << 8);
 }
 
 static inline void passIRQ(streaming chanend fromRx, streaming chanend toTx) {
@@ -90,7 +96,7 @@ static inline void passWKCinc(streaming chanend fromRx, streaming chanend toTx) 
     byteL_ = byteL + 1;
     toTx <: byteL_;
     fromRx :> byteH;
-    if (byteL_) {
+    if (byteL_ == 0) {
         byteH_ = byteH + 1;
     }
     toTx <: byteH_;
@@ -101,12 +107,17 @@ static inline void passWKC(streaming chanend fromRx, streaming chanend toTx) {
     passByte(fromRx, toTx);
 }
 
-void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
-    unsigned char byte, total;
+void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destinationIdentifier, int &destination) {
+    unsigned char byte, total, ot2 = 0, ot;
+    int cnt = 0;
+    int morePDUs, operate, address, length, station;
+    asm("add %0, %1, 0" : "=r"(destinationIdentifier) : "r" (fromRx));
     while (1) {
+        morePDUs = 1;
+        schkct(fromRx, 3);
+        asm("setd res[%0],%1" :: "r" (toTx), "r" (destination));
+        soutct(toTx, 3);
 #pragma loop unroll
-        int morePDUs = 1, operate, address, length, station, timeStamp;
-        fromRx :> timeStamp; toTx <: timeStamp;
         for(int i = 0; i < 12; i++) {
             fromRx :> byte; toTx <: byte;
         }
@@ -121,7 +132,7 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
             passthrough(fromRx, toTx); continue;
         }
         total = passTotalLength(fromRx, toTx);
-        
+        ot = total;
         fromRx :> byte; toTx <: byte; // frame type
         switch(byte) {
         case 1:  // PDU frame
@@ -138,7 +149,7 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
                     if (operate) {
                         for(int i = 0; i < length; i++) {
                             fromRx :> byte;
-                            toTx <: (memoryWord, unsigned char[])[address++];
+                            toTx <: (memoryWord, unsigned char[])[0];//address++];
                         }
                         passWKCinc(fromRx, toTx);
                     } else {
@@ -154,10 +165,11 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
                     address = passADO(fromRx, toTx);   // ADO
                     length = passLEN(fromRx, toTx, morePDUs);   // ADO
                     passIRQ(fromRx, toTx);
+                    ot2 = total;
                     total -= length + 12;
                     if (operate) {
                         for(int i = 0; i < length; i++) {
-                            (memoryWord, unsigned char[])[address++] = passByte(fromRx, toTx);
+                            /*(memoryWord, unsigned char[])[address++] =*/ passByte(fromRx, toTx);
                         }
                         passWKCinc(fromRx, toTx);
                     } else {
@@ -285,10 +297,20 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx) {
             passthrough(fromRx, toTx);
             break;
         }
+/*        printintln(ot);
+        printintln(ot2);
+        printintln(total);
+                    printhexln(address);
+                    printintln(operate);*/
         for(int i = 0; i < total; i++) {      // transmit any trailer, but not the CRC.
             passByte(fromRx, toTx);
         }
         fromRx :> int _;                      // gobble up CRC.
         soutct(toTx, sinct(fromRx));
+        soutct(toTx, 1); 
+        schkct(fromRx, 1); 
+        asm("add %0, %1, 1" : "=r"(cnt) : "r" (cnt));
+        asm("add %0, %1, 1" : "=r"(cnt) : "r" (total));
+        asm("add %0, %1, 1" : "=r"(cnt) : "r" (address));
     }
 }

@@ -3,4 +3,4 @@ test: bin/tester
 
 bin/tester: src/stimulus.c
 	if [ ! -d bin ]; then mkdir bin; fi
-	cc -o bin/tester -std=c99 -m32 -I $(installpath)/include src/stimulus.c $(installpath)/lib/libxsidevice.so 
+	cc -o bin/tester -std=c99 -m32 -I $(XMOS_TOOL_PATH)/include src/stimulus.c $(XMOS_TOOL_PATH)/lib/libxsidevice.so 
