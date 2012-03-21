@@ -14,16 +14,16 @@ Key Features
 ============
 
 * Ethercat test-harness to run on XC-2
+* Ethercat slave to run on XC-3
 * Low latency MII Rx and Tx
 * Rudimentary EtherCAT protocol handler
-* Current latency of 600ns, but memory access has not been implemented yet.
+* Current latency of 800ns, but memory access has not been implemented yet.
+  (PHY latency adds 400 ns) Return path latency approximately 640 ns
+  (preamble) + 400 ns (PHY) + a bit.
 
 To Do
 =====
 
-* Auto detection of ports
-* Multiple ports
-* Port forwarding
 * Mailbox protocol
 * Network variable protocol
 * Memory interface.

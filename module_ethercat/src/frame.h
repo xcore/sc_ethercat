@@ -41,21 +41,15 @@ void rxNProcess(in port dataValid,
 
 /** Function that transmits data on an mii port. This function reads bytes
  * from an input channel, and outputs them one byte at a time. Data should
- * arrive fast enough to prevent a gap in the packet. Prior to anything
- * else, this function writes its channel-end into the destinationChannel
- * variable, enabling dynamic routing.
+ * arrive fast enough to prevent a gap in the packet.
  *
  * \param txData             port on which data is transmitted,
  *                           must be byte buffered.
  *
  * \param fromProtocol       channel on which data arrives
- *
- * \param destinationChannel variable into which the channel end is
- *                           written. Can be used for dynamic routing.
  */
 void txProcess(buffered out port:8 txData,
-               streaming chanend fromProtocol,
-               int &destinationChannel);
+               streaming chanend fromProtocol);
 
 
 

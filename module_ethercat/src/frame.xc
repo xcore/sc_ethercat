@@ -64,12 +64,9 @@ void rxNProcess(in port rxActive, buffered in port:8 rxPort, streaming chanend t
     }
 }
 
-extern assignDestination(int &txp, streaming chanend x);
-
-void txProcess(buffered out port:8 txPort, streaming chanend fromProtocol, int &txp) {
+void txProcess(buffered out port:8 txPort, streaming chanend fromProtocol) {
     register const unsigned poly = 0xEDB88320;
     int cnt = 0;
-    assignDestination(txp, fromProtocol);
     while(1) {
         int clockCounter;
         unsigned int bytesLeft, outputWord;

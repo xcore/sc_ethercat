@@ -30,7 +30,10 @@ controlTokenTable:
     .text
     .align 4
 rxProcessS:
-    ldw  r4, cp[polynomial]
+    getd r11, res[r2]                // Initialise default destination
+    stw  r11, r3[0]                  // To current destination
+    
+    ldw  r4, cp[polynomial]          // r4 is constant - loaded once.
 
     ldap r11, dataValidVector        // Set up dataValid resource
     setv res[r0], r11                // Point vector to entry point

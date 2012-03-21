@@ -11,7 +11,7 @@
 extern int rx0, rx1;
 
 #define MEM_LENGTH 8192
-short memoryWord[MEM_LENGTH/2];
+
 
 void passthrough(streaming chanend fromRx, streaming chanend toTx) {
     unsigned char byte;
@@ -107,11 +107,15 @@ static inline void passWKC(streaming chanend fromRx, streaming chanend toTx) {
     passByte(fromRx, toTx);
 }
 
-void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destinationIdentifier, int &destination) {
+void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destination, short memoryWord[]) {
     unsigned char byte, total, ot2 = 0, ot;
     int cnt = 0;
     int morePDUs, operate, address, length, station;
-    asm("add %0, %1, 0" : "=r"(destinationIdentifier) : "r" (fromRx));
+    int defaultDest;
+
+    asm("getd %0,res[%1]" : "=r" (defaultDest) : "r" (toTx));
+    destination = defaultDest;
+
     while (1) {
         morePDUs = 1;
         schkct(fromRx, 3);
