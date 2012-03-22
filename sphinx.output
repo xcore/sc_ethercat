@@ -1,0 +1,30 @@
+Running Sphinx v1.1.2
+loading pickled environment... not yet created
+building [html]: targets for 5 source files that are out of date
+updating environment: 5 added, 0 changed, 0 removed
+reading sources... [ 20%] api
+Rendering Doxygen struct mii_ethercat_ports
+Rendering Doxygen function void ethercat_port_init
+Rendering Doxygen function void rxProcessS
+Rendering Doxygen function void txProcess
+Rendering Doxygen function void frameProcess
+reading sources... [ 40%] design-notes
+reading sources... [ 60%] index
+reading sources... [ 80%] summary
+reading sources... [100%] usage
+
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+writing output... [ 20%] api
+writing output... [ 40%] design-notes
+writing output... [ 60%] index
+writing output... [ 80%] summary
+writing output... [100%] usage
+
+writing additional files... genindex search
+copying static files... done
+dumping search index... done
+dumping object inventory... done
+build succeeded.

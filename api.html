@@ -1,0 +1,244 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>API &mdash; Ethercat  documentation</title>
+    <link rel="stylesheet" href="_static/xdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/xcomment.js"></script>
+    <link rel="top" title="Ethercat  documentation" href="index.html" />
+    <link rel="prev" title="Usage" href="usage.html" /> 
+
+<script>
+function setheight() {
+h1 = document.getElementById('d1').style.height;
+h2 = document.getElementById('d2').style.height;
+
+if (parseInt(h1) > parseInt(h2)) {
+document.getElementById('d2').style.height=h1 + "px";
+}
+else {
+document.getElementById('d1').style.height=h2 + "px";
+}
+
+}
+</script>
+</head>
+
+<body onload="setheight();">
+
+  
+
+    <div class="document" id='d1'>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+<div style="float: right">
+<a href="usage.html"
+                        title="previous chapter"> &lt&lt </a>
+</div>
+
+            
+  <div class="section" id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="internal">
+<h2>Internal<a class="headerlink" href="#internal" title="Permalink to this headline">¶</a></h2>
+<p>This section contains internal documentation - that is the bits that make
+up the ethercat controller.</p>
+<dl class="type">
+<dt id="mii_ethercat_ports">
+<tt class="descname">mii_ethercat_ports</tt><a class="headerlink" href="#mii_ethercat_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Structure containing all the ports of an MII PHY.</p>
+<p><strong>Structure Members:</strong></p>
+<dl class="member">
+<dt id="mii_ethercat_ports.clk_mii_rx">
+clock <tt class="descname">clk_mii_rx</tt><a class="headerlink" href="#mii_ethercat_ports.clk_mii_rx" title="Permalink to this definition">¶</a></dt>
+<dd><p>RX Clock Block.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="mii_ethercat_ports.clk_mii_tx">
+clock <tt class="descname">clk_mii_tx</tt><a class="headerlink" href="#mii_ethercat_ports.clk_mii_tx" title="Permalink to this definition">¶</a></dt>
+<dd><p>TX Clock Block.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="mii_ethercat_ports.p_mii_rxclk">
+port <tt class="descname">p_mii_rxclk</tt><a class="headerlink" href="#mii_ethercat_ports.p_mii_rxclk" title="Permalink to this definition">¶</a></dt>
+<dd><p>MII RX clock wire.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="mii_ethercat_ports.p_mii_rxd">
+in buffered port:8 <tt class="descname">p_mii_rxd</tt><a class="headerlink" href="#mii_ethercat_ports.p_mii_rxd" title="Permalink to this definition">¶</a></dt>
+<dd><p>MII RX data wire.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="mii_ethercat_ports.p_mii_rxdv">
+in port <tt class="descname">p_mii_rxdv</tt><a class="headerlink" href="#mii_ethercat_ports.p_mii_rxdv" title="Permalink to this definition">¶</a></dt>
+<dd><p>MII RX data valid wire.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="mii_ethercat_ports.p_mii_txclk">
+port <tt class="descname">p_mii_txclk</tt><a class="headerlink" href="#mii_ethercat_ports.p_mii_txclk" title="Permalink to this definition">¶</a></dt>
+<dd><p>MII TX clock wire.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="mii_ethercat_ports.p_mii_txd">
+out buffered port:8 <tt class="descname">p_mii_txd</tt><a class="headerlink" href="#mii_ethercat_ports.p_mii_txd" title="Permalink to this definition">¶</a></dt>
+<dd><p>MII TX data wire.</p>
+</dd></dl>
+
+<dl class="member">
+<dt id="mii_ethercat_ports.p_mii_txen">
+out port <tt class="descname">p_mii_txen</tt><a class="headerlink" href="#mii_ethercat_ports.p_mii_txen" title="Permalink to this definition">¶</a></dt>
+<dd><p>MII TX enable wire.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ethercat_port_init">
+void <tt class="descname">ethercat_port_init</tt><big>(</big><a class="reference internal" href="#mii_ethercat_ports" title="mii_ethercat_ports"><span>mii_ethercat_ports</span></a><em>&nbsp;&amp;m</em><big>)</big><a class="headerlink" href="#ethercat_port_init" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that initialises the ports and clockblocks that control the PHY.</p>
+<p>This needs to be called once for each PHY.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>m</strong> &#8211; port structure.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="rxProcessS">
+void <tt class="descname">rxProcessS</tt><big>(</big>in port<em>&nbsp;dataValid</em>, buffered in port:8<em>&nbsp;rxData</em>, streaming chanend<em>&nbsp;toProtocol</em>, int<em>&nbsp;&amp;destinationChannel</em><big>)</big><a class="headerlink" href="#rxProcessS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that receives data on the master port.</p>
+<p>Only frames arriving on this port are interpreted. This function reads byte from the input port (guarded by the datavalid port), and outputs them on the channel. The data stream is opened with control token 3 (indicating that a valid CRC will eb transmitted at the end of the stream) and terminated with two control tokens. One control token to signal the CRC status (15: CRC error, 0: CRC good), and an END token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>dataValid</strong> &#8211; port that signals whether rxData contains valid data.</li>
+<li><strong>rxData</strong> &#8211; port on which data arrives, must be byte buffered</li>
+<li><strong>toProtocol</strong> &#8211; channel end on which packet is transmitted</li>
+<li><strong>destinationChannel</strong> &#8211; channelend to use as destination - can be modified on the fly</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="txProcess">
+void <tt class="descname">txProcess</tt><big>(</big>buffered out port:8<em>&nbsp;txData</em>, streaming chanend<em>&nbsp;fromProtocol</em><big>)</big><a class="headerlink" href="#txProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that transmits data on an mii port.</p>
+<p>This function reads bytes from an input channel, and outputs them one byte at a time. Data should arrive fast enough to prevent a gap in the packet.</p>
+<p>The first token is a control token: a zero control token indicates that the transmitter should append a CRC; a non-zero control token indicates that a valid CRC is included at the end of the message. After the initial control token, a stream of data bytes are expected on the channel, terminated by a control token. The terminating token is either 0 or 0xF depending on whether the CRC on the incoming packet was valid or not. If the TX function was asked to add a valid CRC, <em>and</em> the incoming CRC was deemed invalid, then it will knacker the outgoing CRC too. Just to be consistent. Finally a &#8216;1&#8217; control token is read closing the stream.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>txData</strong> &#8211; port on which data is transmitted, must be byte buffered.</li>
+<li><strong>fromProtocol</strong> &#8211; channel on which data arrives</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="frameProcess">
+void <tt class="descname">frameProcess</tt><big>(</big>streaming chanend<em>&nbsp;fromRx</em>, streaming chanend<em>&nbsp;toTx</em>, int<em>&nbsp;&amp;destination</em>, short<em>&nbsp;memory[]</em><big>)</big><a class="headerlink" href="#frameProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function that processes all frames.</p>
+<p>Frames are streamed in over fromRx and streamed out over toTx. The data streams are opened with control token 3 and terminated with two control tokens. One control token to signal the CRC status (15: CRC error, 0: CRC good), and an END token.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>fromRx</strong> &#8211; stream into the process, comes from <a class="reference internal" href="#rxProcessS" title="rxProcessS"><span>rxProcessS()</span></a></li>
+<li><strong>toTx</strong> &#8211; stream into the process, goes to <a class="reference internal" href="#txProcess" title="txProcess"><span>txProcess()</span></a></li>
+<li><strong>destination</strong> &#8211; channel end where to send to.</li>
+<li><strong>memory</strong> &#8211; array of words that contains the Ethercat memory.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" id='d2'>
+        <div class="sphinxsidebarwrapper">
+<h3><a href="index.html">Ethercat</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="summary.html">Ethercat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="summary.html#module-ethercat">module_ethercat</a></li>
+<li class="toctree-l1"><a class="reference internal" href="design-notes.html">Ethercat Design Notes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#internal">Internal</a></li>
+</ul>
+</li>
+</ul>
+
+<div id="searchbox" style="display: none;margin-bottom: 10px;">
+  <h3>Search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" size="18" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+
+
+
+    <div class="footer">
+    </div>
+  </body>
+</html>
+
+
+
