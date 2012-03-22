@@ -60,6 +60,17 @@ document.getElementById('d1').style.height=h2 + "px";
             
   <div class="section" id="ethercat-design-notes">
 <h1>Ethercat Design Notes<a class="headerlink" href="#ethercat-design-notes" title="Permalink to this headline">¶</a></h1>
+<p>The prototype environment to develop Ethercat is shown below. It comprises
+a single L2 motherboard, with 4 ethernet &#8220;slices&#8221;.The bottom left port is
+port 0, port 1, 2, and 3 are anticlockwise from there. The XN file included
+models that board with all four slices, but missing ports are automatically
+skipped.</p>
+<div class="figure">
+<img alt="_images/photo-4-slices.jpg" src="_images/photo-4-slices.jpg" style="width: 50%;" />
+<p class="caption">Photo of prototype ethercat system with 4 ports.</p>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
 <p>Ethercat requires a short latency between incoming packet and outgoing
 packet. The key to meeting this latency is to use a different design method
 then usual for input and output.</p>
@@ -79,6 +90,7 @@ use.</p>
 <li>Frame processing thread (1)</li>
 <li>Topology controller (1)</li>
 </ol>
+</div>
 <div class="section" id="data-rx-and-tx">
 <h2>Data Rx and Tx<a class="headerlink" href="#data-rx-and-tx" title="Permalink to this headline">¶</a></h2>
 <p>Each port has a data receive and transmit thread. The receive thread reads
@@ -149,8 +161,8 @@ by the Rx/FrameController threads.</p>
 <h3><a href="index.html">Ethercat</a></h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="summary.html">Ethercat</a></li>
-<li class="toctree-l1"><a class="reference internal" href="summary.html#module-ethercat">module_ethercat</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Ethercat Design Notes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-rx-and-tx">Data Rx and Tx</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#frame-processing">Frame processing</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#toplogy-controller">Toplogy controller</a></li>
