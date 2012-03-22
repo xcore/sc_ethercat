@@ -1,6 +1,20 @@
 Ethercat Design Notes
 =====================
 
+The prototype environment to develop Ethercat is shown below. It comprises
+a single L2 motherboard, with 4 ethernet "slices".The bottom left port is
+port 0, port 1, 2, and 3 are anticlockwise from there. The XN file included
+models that board with all four slices, but missing ports are automatically
+skipped.
+
+.. figure:: photo-4-slices.*
+   :width: 50%
+
+   Photo of prototype ethercat system with 4 ports.
+
+Philosophy
+----------
+
 Ethercat requires a short latency between incoming packet and outgoing
 packet. The key to meeting this latency is to use a different design method
 then usual for input and output.
