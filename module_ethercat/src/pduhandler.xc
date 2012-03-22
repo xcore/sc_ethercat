@@ -120,7 +120,7 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destina
         morePDUs = 1;
         schkct(fromRx, 3);
         asm("setd res[%0],%1" :: "r" (toTx), "r" (destination));
-        soutct(toTx, 3);
+        soutct(toTx, 0);              // Recompute CRC.
 #pragma loop unroll
         for(int i = 0; i < 12; i++) {
             fromRx :> byte; toTx <: byte;

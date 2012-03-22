@@ -72,7 +72,8 @@ void txProcess(buffered out port:8 txPort, streaming chanend fromProtocol) {
         unsigned int bytesLeft, outputWord;
         unsigned char outputChar;
         unsigned crc = 0x9226F562, incomingCrc;
-        schkct(fromProtocol, 3);
+        int keepExistingCRC;
+        keepExistingCRC = sinct(fromProtocol);
         txPort <: 0x55;
 #pragma loop unroll
         for(int i = 0; i < 6; i++) {
@@ -87,14 +88,18 @@ void txProcess(buffered out port:8 txPort, streaming chanend fromProtocol) {
             crc8shr(crc, outputChar, poly);      
         }
         txPort <: outputChar;
-        crc32(crc, 0, poly);
-        crc = ~crc;
-        txPort <: >> crc;
-        txPort <: >> crc;
-        incomingCrc = sinct(fromProtocol);
-        txPort <: >> crc;
-        crc ^= incomingCrc<<6;
-        txPort <: >> crc;
+        if (keepExistingCRC) {
+            sinct(fromProtocol);
+        } else {
+            crc32(crc, keepExistingCRC, poly);
+            crc = ~crc;
+            txPort <: >> crc;
+            txPort <: >> crc;
+            incomingCrc = sinct(fromProtocol);
+            txPort <: >> crc;
+            crc ^= incomingCrc<<6;
+            txPort <: >> crc;
+        }
         schkct(fromProtocol, 1);
         asm("add %0, %1, 1" : "=r"(cnt) : "r" (cnt));
     }

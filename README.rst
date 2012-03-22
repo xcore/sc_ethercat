@@ -44,7 +44,6 @@ latency).
 Known Issues
 ============
 
-* Each packets that flows back gets an extra CRC (!)
 * app_ethercat_test won't build (and is deprecated)
 
 Required Repositories
