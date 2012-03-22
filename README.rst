@@ -14,12 +14,16 @@ Key Features
 ============
 
 * Ethercat test-harness to run on XC-2
+
 * Ethercat slave to run on XC-3
+
 * Low latency MII Rx and Tx
+
 * Rudimentary EtherCAT protocol handler
-* Current latency of 800ns, but memory access has not been implemented yet.
-  (PHY latency adds 400 ns) Return path latency approximately 640 ns
-  (preamble) + 400 ns (PHY) + a bit.
+
+* Current latency of 800ns, but memory access has not been implemented yet
+  (PHY latency adds 400 ns). Return path latency approximately 640 ns
+  (preamble) + 400 ns (PHY) + 160 ns (processing)
 
 To Do
 =====
@@ -40,12 +44,15 @@ latency).
 Known Issues
 ============
 
-* <Bullet pointed list of problems>
+* Each packets that flows back gets an extra CRC (!)
+* app_ethercat_test won't build (and is deprecated)
 
 Required Repositories
 =====================
 
-* xcommon git\@github.com:xcore/xcommon.git
+* sc_ethernet git\@github.com:xcore/sc_ethernet.git  (SMI module)
+* xcommon git\@github.com:xcore/xcommon.git  (build system)
+* xdoc git\@github.com:xcore/xdoc.git  (documentation)
 
 Support
 =======

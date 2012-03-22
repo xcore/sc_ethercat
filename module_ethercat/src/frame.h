@@ -3,11 +3,14 @@
 // University of Illinois/NCSA Open Source License posted in
 // LICENSE.txt and at <http://github.xcore.com/>
 
-/** Function that receives data on the master port. Only frames arriving on
+/** DEPRECATED
+ *
+ * Function that receives data on the master port. Only frames arriving on
  * this port are interpreted. This function reads byte from the input port
  * (guarded by the datavalid port), and outputs them on the channel. The
- * data stream is terminated with a control token, either token 15 (CRC
- * error), or token 0 (CRC good).
+ * data stream is opened with control token 3 and terminated with two
+ * control tokens. One control token to signal the CRC status (15: CRC
+ * error, 0: CRC good), and an END token.
  *
  * \param dataValid port that signals whether rxData contains valid data.
  *
@@ -19,11 +22,14 @@ void rx0Process(in port dataValid,
                 buffered in port:8 rxData,
                 streaming chanend toProtocol);
 
-/** Function that receives data on a non master port. This function reads
+/** DEPRECATED
+ *
+ * Function that receives data on a non master port. This function reads
  * byte from the input port (guarded by the datavalid port), and outputs
  * them on the channel, ready to be output immediately on the next port.
- * The data stream is terminated with a control token, either token 15 (CRC
- * error), or token 0 (CRC good).
+ * The data stream is opened with control token 3 and terminated with two
+ * control tokens. One control token to signal the CRC status (15: CRC
+ * error, 0: CRC good), and an END token.
  *
  * When data arrives on this port, the function reads a channel end from
  * the global variable rx1, and it uses this as a destination channel-end
@@ -56,10 +62,12 @@ void txProcess(buffered out port:8 txData,
 /** Function that receives data on the master port. Only frames arriving on
  * this port are interpreted. This function reads byte from the input port
  * (guarded by the datavalid port), and outputs them on the channel. The
- * data stream is terminated with a control token, either token 15 (CRC
- * error), or token 0 (CRC good), followed by an END control token
+ * data stream is opened with control token 3 and terminated with two
+ * control tokens. One control token to signal the CRC status (15: CRC
+ * error, 0: CRC good), and an END token.
  *
- * \param dataValid          port that signals whether rxData contains valid data.
+ * \param dataValid          port that signals whether rxData contains
+ *                           valid data.
  *
  * \param rxData             port on which data arrives, must be byte buffered
  *

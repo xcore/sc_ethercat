@@ -7,6 +7,7 @@
 #include <print.h>
 #include <xs1.h>
 #include <frame.h>
+#include "ethercat.h"
 #include "pduhandler.h"
 #include "smi.h"
 
@@ -21,47 +22,30 @@ extern int destinationsCore1_[NUMBER_DYNAMIC_CHANNELS];
 
 extern void waitFor(int &x);
 
-/** This structure is subtly different from the normal mii_interface_t
- * in that it is 8 bit buffered rather than 32 bit buffered. No need
- * for a facke port either.
- */
-typedef struct mii_interface_t {
-    clock clk_mii_rx;            /**< MII RX Clock Block **/
-    clock clk_mii_tx;            /**< MII TX Clock Block **/
-    
-     port p_mii_rxclk;         /**< MII RX clock wire */
-    in buffered port:8 p_mii_rxd; /**< MII RX data wire */
-    in port p_mii_rxdv;          /**< MII RX data valid wire */
-    
-     port p_mii_txclk;       /**< MII TX clock wire */
-    out port p_mii_txen;       /**< MII TX enable wire */
-    out buffered port:8 p_mii_txd; /**< MII TX data wire */
-} mii_interface_t;
+on stdcore[0]: out port disableFlash = PORT_SPI_DISABLE;
 
-on stdcore[0]: out port disableFlash = XS1_PORT_8D;
-
-on stdcore[0]: mii_interface_t mii0 = {
+on stdcore[0]: mii_ethercat_ports mii0 = {
     XS1_CLKBLK_3, XS1_CLKBLK_4,
     PORT_ETH_RXCLK_0, PORT_ETH_RXD_0, PORT_ETH_RXDV_0,
-    PORT_ETH_TXCLK_0, PORT_ETH_TXEN_0, PORT_ETH_TXD_0,
+    PORT_ETH_TXCLK_0, PORT_ETH_TXD_0, PORT_ETH_TXEN_0,
 };
 
-on stdcore[0]: mii_interface_t mii1 = {
+on stdcore[0]: mii_ethercat_ports mii1 = {
     XS1_CLKBLK_1, XS1_CLKBLK_2,
     PORT_ETH_RXCLK_1, PORT_ETH_RXD_1, PORT_ETH_RXDV_1,
-    PORT_ETH_TXCLK_1, PORT_ETH_TXEN_1, PORT_ETH_TXD_1,
+    PORT_ETH_TXCLK_1, PORT_ETH_TXD_1, PORT_ETH_TXEN_1,
 };
 
-on stdcore[1]: mii_interface_t mii2 = {
+on stdcore[1]: mii_ethercat_ports mii2 = {
     XS1_CLKBLK_3, XS1_CLKBLK_4,
     PORT_ETH_RXCLK_2, PORT_ETH_RXD_2, PORT_ETH_RXDV_2,
-    PORT_ETH_TXCLK_2, PORT_ETH_TXEN_2, PORT_ETH_TXD_2,
+    PORT_ETH_TXCLK_2, PORT_ETH_TXD_2, PORT_ETH_TXEN_2,
 };
 
-on stdcore[1]: mii_interface_t mii3 = {
+on stdcore[1]: mii_ethercat_ports mii3 = {
     XS1_CLKBLK_1, XS1_CLKBLK_2,
     PORT_ETH_RXCLK_3, PORT_ETH_RXD_3, PORT_ETH_RXDV_3,
-    PORT_ETH_TXCLK_3, PORT_ETH_TXEN_3, PORT_ETH_TXD_3,
+    PORT_ETH_TXCLK_3, PORT_ETH_TXD_3, PORT_ETH_TXEN_3,
 };
 
 on stdcore[0]: smi_interface_t smi0 = { 0x80000000,
@@ -79,19 +63,6 @@ on stdcore[1]: smi_interface_t smi3 = { 0,
 
 on stdcore[0]: clock clk_smi0 = XS1_CLKBLK_5;
 on stdcore[1]: clock clk_smi2 = XS1_CLKBLK_5;
-
-void mii_port_init(mii_interface_t &m) {
-	configure_clock_src(m.clk_mii_rx, m.p_mii_rxclk);
-	configure_clock_src(m.clk_mii_tx, m.p_mii_txclk);
-
-	set_clock_fall_delay(m.clk_mii_tx, 7); // NEEDED?
-
-    configure_in_port_strobed_slave(m.p_mii_rxd, m.p_mii_rxdv, m.clk_mii_rx);
-    configure_out_port_strobed_master(m.p_mii_txd, m.p_mii_txen, m.clk_mii_tx, 0);
-
-	start_clock(m.clk_mii_rx);
-	start_clock(m.clk_mii_tx);
-}
 
 int phyPresentAndUp(smi_interface_t &smi) {
     int basicStatus = smi_reg(smi, 1, 0, 1);
@@ -178,7 +149,7 @@ void publishDestination(chanend init, streaming chanend dest) {
     init <: i;
 }
 
-void ethernetCore(mii_interface_t &mii0, mii_interface_t &mii1,
+void ethernetCore(mii_ethercat_ports &mii0, mii_ethercat_ports &mii1,
                   smi_interface_t &smi0, smi_interface_t &smi1,
                   clock clk_smi, out port ?disableFlash,
                   chanend toMaster,
@@ -199,8 +170,8 @@ void ethernetCore(mii_interface_t &mii0, mii_interface_t &mii1,
     resetTime += 50000000;
     tmr when timerafter(resetTime) :> void;
 
-    mii_port_init(mii0);
-    mii_port_init(mii1);
+    ethercat_port_init(mii0);
+    ethercat_port_init(mii1);
     configure_clock_ref (clk_smi, 10);
     configure_out_port_no_ready(smi0.p_smi_mdc,   clk_smi, 1);
     configure_out_port_no_ready(smi1.p_smi_mdc,   clk_smi, 1<<SMI_MDC_BIT);
@@ -246,7 +217,7 @@ int main(void) {
                                     destinationsCore0_,
                                     1);
         on stdcore[1]: ethernetCore(mii2, mii3, smi2, smi3, clk_smi2,
-                                    null, core1CheckerToMaster,
+                                    null,         core1CheckerToMaster,
                                     destinationsCore1,
                                     destinationsCore1_,
                                     0);
