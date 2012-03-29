@@ -49,6 +49,7 @@ Known Issues
 Required Repositories
 =====================
 
+* hw_slicekit_system git\@github.com:xcore/hw_slicekit_system.git  (XN file)
 * sc_ethernet git\@github.com:xcore/sc_ethernet.git  (SMI module)
 * xcommon git\@github.com:xcore/xcommon.git  (build system)
 * xdoc git\@github.com:xcore/xdoc.git  (documentation)

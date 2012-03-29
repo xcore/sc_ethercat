@@ -41,6 +41,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_ethernet_smi}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -53,6 +55,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_ethernet_smi}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.cpp.compiler.base.1161396055" name="XMOS C++ Compiler" superClass="com.xmos.cdt.cpp.compiler.base">
@@ -68,6 +72,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_ethernet_smi}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -80,6 +86,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_ethernet_smi}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.xc.compiler.base.86146009" name="XMOS XC Compiler" superClass="com.xmos.cdt.xc.compiler.base">
@@ -100,6 +108,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include/gcc&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_TOOL_PATH}/target/include&quot;' />
@@ -116,6 +126,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include/gcc&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.core.assembler.base.839004633" name="XMOS Assembler" superClass="com.xmos.cdt.core.assembler.base">
@@ -132,6 +144,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_ethernet_smi}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn}&quot;' />
                                 </option>
                                 <option id="com.xmos.c.compiler.option.include.paths.11111" valueType="includePath" superClass="com.xmos.c.compiler.option.include.paths">
                                     <listOptionValue builtIn="false" value='&quot;${XMOS_DOC_PATH}/../target/include&quot;' />
@@ -144,6 +158,8 @@
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_ethernet_smi}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread/src}&quot;' />
                                     <listOptionValue builtIn="false" value='&quot;${workspace_loc:/sc_ethernet/module_mii_singlethread}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn/src}&quot;' />
+                                    <listOptionValue builtIn="false" value='&quot;${workspace_loc:/hw_slicekit_system/module_slicekit_xn}&quot;' />
                                 </option>
                             </tool>
                             <tool id="com.xmos.cdt.archiver.base.730151905" name="Archiver" superClass="com.xmos.cdt.archiver.base" />
