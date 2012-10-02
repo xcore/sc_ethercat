@@ -107,8 +107,12 @@ static inline void passWKC(streaming chanend fromRx, streaming chanend toTx) {
     passByte(fromRx, toTx);
 }
 
+
+#pragma unsafe arrays
 void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destination, short memoryWord[]) {
-    unsigned char byte, total, ot2 = 0, ot;
+    int handled = 0;
+    unsigned char byte, ot2 = 0;
+    unsigned total;
     int cnt = 0;
     int morePDUs, operate, address, length, station;
     int defaultDest;
@@ -127,17 +131,22 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destina
         }
         fromRx :> byte; toTx <: byte;
         if (byte != 0x88) {
-            printf("Got <%02x> not 0x88\n", byte);
+//            printf("Got <%02x> not 0x88\n", byte);
             passthrough(fromRx, toTx); continue;
         }
         fromRx :> byte; toTx <: byte;
         if (byte != 0xA4) {
-            printf("Got <%02x> not 0xA4\n", byte);
+//            printf("Got <%02x> not 0xA4\n", byte);
             passthrough(fromRx, toTx); continue;
         }
         total = passTotalLength(fromRx, toTx);
-        ot = total;
-        fromRx :> byte; toTx <: byte; // frame type
+        byte = total >> 12;
+        total &= 0xfff;
+//        ot = total;
+//        fromRx :> byte; toTx <: byte; // frame type
+        if (total < 44) {
+            total = 44;
+        }
         switch(byte) {
         case 1:  // PDU frame
             do {
@@ -153,7 +162,7 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destina
                     if (operate) {
                         for(int i = 0; i < length; i++) {
                             fromRx :> byte;
-                            toTx <: (memoryWord, unsigned char[])[0];//address++];
+                            toTx <: (memoryWord, unsigned char[])[address++];
                         }
                         passWKCinc(fromRx, toTx);
                     } else {
@@ -173,7 +182,7 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destina
                     total -= length + 12;
                     if (operate) {
                         for(int i = 0; i < length; i++) {
-                            /*(memoryWord, unsigned char[])[address++] =*/ passByte(fromRx, toTx);
+                            (memoryWord, unsigned char[])[address++] = passByte(fromRx, toTx);
                         }
                         passWKCinc(fromRx, toTx);
                     } else {
@@ -199,6 +208,7 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destina
                         }
                         passWKCinc(fromRx, toTx);
                     } else {
+                        printf("Station %04x Word %04x\n", station, memoryWord[0x0010/2]);
                         for(int i = 0; i < length; i++) {
                             passByte(fromRx, toTx);
                         }
@@ -256,6 +266,7 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destina
                     passIRQ(fromRx, toTx);
                     total -= length + 12;
                     if (operate) {
+#pragma unsafe arrays
                         for(int i = 0; i < length; i++) {
                             (memoryWord, unsigned char[])[address++] = passByte(fromRx, toTx);
                         }
@@ -301,11 +312,6 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destina
             passthrough(fromRx, toTx);
             break;
         }
-/*        printintln(ot);
-        printintln(ot2);
-        printintln(total);
-                    printhexln(address);
-                    printintln(operate);*/
         for(int i = 0; i < total; i++) {      // transmit any trailer, but not the CRC.
             passByte(fromRx, toTx);
         }
@@ -316,5 +322,6 @@ void frameProcess(streaming chanend fromRx, streaming chanend toTx, int &destina
         asm("add %0, %1, 1" : "=r"(cnt) : "r" (cnt));
         asm("add %0, %1, 1" : "=r"(cnt) : "r" (total));
         asm("add %0, %1, 1" : "=r"(cnt) : "r" (address));
+        asm("add %0, %1, 1" : "=r"(handled) : "r" (handled));
     }
 }

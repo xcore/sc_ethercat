@@ -108,6 +108,7 @@ void handlePacket(int a, int nBytes, int rxTime, int txTime) {
     }
     avg = avsum * 1000 / (avwrapped?NAV:avc);
     printf("txTime %10u, rxTime %10u diff %d ns Av %d.%02d ns \n", txTime, rxTime, diff * 10, avg / 100, avg % 100);
+#if 0
     for(int i = 0; i < nBytes; i++) {
         int v;
         asm("ld8u %0, %1[%2]" : "=r" (v) : "r" (a), "r" (i));
@@ -122,6 +123,7 @@ void handlePacket(int a, int nBytes, int rxTime, int txTime) {
         }
     }
     printf("\n");
+#endif
 }
 
 void generateEthercat(chanend cIn, chanend cOut, chanend cNotifications) {
@@ -143,7 +145,7 @@ void generateEthercat(chanend cIn, chanend cOut, chanend cNotifications) {
         select {
         case miiNotified(miiData, cNotifications);
         case t when timerafter(timeout) :> void:
-            timeout += 200000000;
+            timeout += 100000000;
             transmitTime = miiOutPacket(cOut, (packet,  int[]), 0, sizeof(packet)-8);
             miiOutPacketDone(cOut);
             led1Status = ~led1Status;
